@@ -6,7 +6,7 @@ import pandas as pd
 import os
 
 
-produc_list=['fruits-legumes']#,'snacks-confiseries', 'viandes-poissons', 'produits-laitiers-ufs-plats-prep' , 'boulangerie-patisserie-petit-dej', 'pates-condiments-conserves' , 'surgeles' , 'boissons-cafe-the' , 'vins-bieres-spiritueux']
+produc_list=['fruits-legumes','snacks-confiseries', 'viandes-poissons', 'produits-laitiers-ufs-plats-prep' , 'boulangerie-patisserie-petit-dej', 'pates-condiments-conserves' , 'surgeles' , 'boissons-cafe-the' , 'vins-bieres-spiritueux']
 browser = webdriver.Firefox()
 login_url = 'https://login.migros.ch/login'
 # Replace with the actual login URL

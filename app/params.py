@@ -1,4 +1,4 @@
 import os
 
-USER = os.getenv('USERNAME')
+MAIL = os.getenv('MAIL')
 PWD = os.getenv('PASSWORD')

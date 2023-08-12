@@ -18,13 +18,16 @@ for item in produc_list :
     print(f'Chargement des données de {item}')
     print('************************************************************')
     answer, item = make_a_soup(browser, url, item)
-    data = dict_to_scrap(answer)
+    data = dict_to_scrap(answer, item)
     dftemp = pd.DataFrame.from_dict(data, orient ='index')
     df = df.append(dftemp)
 
 browser.close()
 
 df = df.drop_duplicates()
+df['Prix'] = df['Prix'].str.replace('.–$', '').astype(float)
+df['Prix Original'] = df['Prix Original'].str.replace('.–$', '').astype(float)
+
 current_directory = os.path.dirname(os.path.abspath(__file__))
 excel_directory = os.path.join(current_directory, 'Xcl')
 excel_file_path = os.path.join(excel_directory, f'scrapped_{datetime.datetime.today().date()}.xlsx')

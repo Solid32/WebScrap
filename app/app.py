@@ -41,7 +41,7 @@ def make_a_soup(browser, url, item):
 
     return answer, item
 
-def dict_to_scrap(answer):
+def dict_to_scrap(answer, item):
     soup = BeautifulSoup(answer, 'html.parser')
     healthsoup = soup.find_all('li', class_='item ng-star-inserted')
     dictSup = {}
@@ -67,12 +67,12 @@ def dict_to_scrap(answer):
         if price_span:
             dictSub['Prix'] = price_span.text.strip()
         else:
-            dictSub['Prix'] = "N/A"
+            dictSub['Prix'] = "0"
         original_price_span = elem.find('span', id=f'{key}-original-price')
         if original_price_span:
             dictSub['Prix Original'] = original_price_span.text.strip()
         else:
-            dictSub['Prix Original'] = "N/A"
+            dictSub['Prix Original'] = "0"
         try :
             dictSub['Comment'] = elem.find('lsp-product-badge').text.strip()
         except :
@@ -82,6 +82,7 @@ def dict_to_scrap(answer):
             dictSub['Image'] = elem.find('img', class_='ng-star-inserted')['src']
         except :
             None
+        dictSub['Categorie'] = item
         dictSup[key] = dictSub
 
     return dictSup

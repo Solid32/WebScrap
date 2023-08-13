@@ -1,10 +1,11 @@
 from selenium import webdriver
-from app.app import login_to_website, dict_to_scrap , make_a_soup
+from app.app import login_to_website, dict_to_scrap , make_a_soup, dict_links, make_a_dict
 from app.params import *
 import datetime
 import pandas as pd
 import os
 
+from bs4 import BeautifulSoup
 
 produc_list=['fruits-legumes','snacks-confiseries', 'viandes-poissons', 'produits-laitiers-ufs-plats-prep' , 'boulangerie-patisserie-petit-dej', 'pates-condiments-conserves' , 'surgeles' , 'boissons-cafe-the' , 'vins-bieres-spiritueux']
 browser = webdriver.Firefox()
@@ -13,15 +14,27 @@ login_url = 'https://login.migros.ch/login'
 login_to_website(browser, login_url, MAIL, PWD)
 url = 'https://www.migros.ch/fr/category'
 df = pd.DataFrame()
-for item in produc_list :
-    print('************************************************************')
-    print(f'Chargement des données de {item}')
-    print('************************************************************')
-    answer, item = make_a_soup(browser, url, item)
-    data = dict_to_scrap(answer, item)
-    dftemp = pd.DataFrame.from_dict(data, orient ='index')
-    df = df.append(dftemp)
 
+
+for elem in produc_list:
+    print('************************************************************')
+    print(f'Chargement des dictionnaires de liens pour {elem}')
+    print('************************************************************')
+
+    answer = make_a_dict(browser, url, elem)
+    soup = BeautifulSoup(answer, 'html.parser')
+    dictLex = dict_links(soup)
+
+    for key, value in dictLex.items():
+        print('************************************************************')
+        print(f'Chargement des données de {value}')
+        print('************************************************************')
+
+        answers = make_a_soup(browser, 'https://www.migros.ch', key)
+        soup = BeautifulSoup(answers, 'html.parser')
+        data = dict_to_scrap(soup, elem, value)
+        dftemp = pd.DataFrame.from_dict(data, orient='index')
+        df = df.append(dftemp)
 browser.close()
 
 df = df.drop_duplicates()

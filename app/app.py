@@ -1,5 +1,4 @@
 
-from bs4 import BeautifulSoup
 import time
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,11 +21,18 @@ def login_to_website(browser, login_url, username, password):
     # Submit the form
     password_field.submit()
 
+def make_a_dict(browser, url, item):
+    race_day_url = f'{url}/{item}'
+    time.sleep(5)
+    browser.get(race_day_url)
+    wait = WebDriverWait(browser, 5)
+    time.sleep(5)
+    answer = browser.page_source
+
+    return answer
+
 def make_a_soup(browser, url, item):
     race_day_url = f'{url}/{item}'
-
-
-    time.sleep(3)
     browser.get(race_day_url)
     wait = WebDriverWait(browser, 5)
     while True:
@@ -39,10 +45,10 @@ def make_a_soup(browser, url, item):
             break
     answer = browser.page_source
 
-    return answer, item
+    return answer
 
-def dict_to_scrap(answer, item):
-    soup = BeautifulSoup(answer, 'html.parser')
+def dict_to_scrap(soup, item, Subitem):
+
     healthsoup = soup.find_all('li', class_='item ng-star-inserted')
     dictSup = {}
     for elem in healthsoup :
@@ -51,7 +57,7 @@ def dict_to_scrap(answer, item):
         if product_id_element:
             key = product_id_element['data-cy'].split('-')[-1]
         dictSub = {}
-        dictSub['Brand'] = elem.find('lsp-product-name').find('div').find('span').text.strip()
+        dictSub['Marque'] = elem.find('lsp-product-name').find('div').find('span').text.strip()
         product_name1 = elem.find('span', {'data-cy': f'product-name-{key}'})
         product_name2 = elem.find('span', {'data-cy': f'product-versioning-{key}'})
         if product_name1 and product_name2:
@@ -62,7 +68,7 @@ def dict_to_scrap(answer, item):
             product_name = product_name2.text.strip()
         else:
             product_name = "N/A"
-        dictSub['Product'] = product_name
+        dictSub['Produit'] = product_name
         price_span = elem.find('span', class_='actual')
         if price_span:
             dictSub['Prix'] = price_span.text.strip()
@@ -74,7 +80,7 @@ def dict_to_scrap(answer, item):
         else:
             dictSub['Prix Original'] = "0"
         try :
-            dictSub['Comment'] = elem.find('lsp-product-badge').text.strip()
+            dictSub['Commentaire'] = elem.find('lsp-product-badge').text.strip()
         except :
             None
         dictSub['Quantity'] = elem.find('lsp-product-quantity').text.strip()
@@ -82,7 +88,18 @@ def dict_to_scrap(answer, item):
             dictSub['Image'] = elem.find('img', class_='ng-star-inserted')['src']
         except :
             None
-        dictSub['Categorie'] = item
+        dictSub['Catégorie'] = item
+        dictSub['Sous-catégorie'] = Subitem
         dictSup[key] = dictSub
 
     return dictSup
+
+
+def dict_links(soup):
+    links = soup.find_all('a' , id=lambda value: value and value.startswith('nav-level3-category'))
+    dictLex = {}
+    for link in links:
+        key = link['href']
+        value = link.get_text()
+        dictLex[key] = value
+    return dictLex

@@ -74,6 +74,7 @@ def dict_to_scrap(soup, item, Subitem):
             dictSub['Prix'] = price_span.text.strip()
         else:
             dictSub['Prix'] = "0"
+        dictSub['Quantity'] = elem.find('lsp-product-quantity').text.strip()
         original_price_span = elem.find('span', id=f'{key}-original-price')
         if original_price_span:
             dictSub['Prix Original'] = original_price_span.text.strip()
@@ -83,13 +84,12 @@ def dict_to_scrap(soup, item, Subitem):
             dictSub['Commentaire'] = elem.find('lsp-product-badge').text.strip()
         except :
             None
-        dictSub['Quantity'] = elem.find('lsp-product-quantity').text.strip()
+        dictSub['Catégorie'] = item
+        dictSub['Sous-catégorie'] = Subitem
         try :
             dictSub['Image'] = elem.find('img', class_='ng-star-inserted')['src']
         except :
             None
-        dictSub['Catégorie'] = item
-        dictSub['Sous-catégorie'] = Subitem
         dictSup[key] = dictSub
 
     return dictSup

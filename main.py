@@ -1,9 +1,10 @@
 from selenium import webdriver
-from app.app import login_to_website, dict_to_scrap , make_a_soup, dict_links, make_a_dict
+from app.app import login_to_website, dict_to_scrap , make_a_soup, dict_links, make_a_dict, converter_final
 from app.params import *
 import datetime
 import pandas as pd
 import os
+import re
 
 from bs4 import BeautifulSoup
 
@@ -40,6 +41,8 @@ browser.close()
 df = df.drop_duplicates()
 df['Prix'] = df['Prix'].str.replace('.–$', '').astype(float)
 df['Prix Original'] = df['Prix Original'].str.replace('.–$', '').astype(float)
+df['Brut Quantity'] = df['Quantity'].apply(converter_final)
+df['Prix au kilo'] = df['Prix']/df['Brut Quantity']
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 excel_directory = os.path.join(current_directory, 'Xcl')

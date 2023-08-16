@@ -2,7 +2,7 @@
 import time
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-
+import re
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -69,7 +69,7 @@ def dict_to_scrap(soup, item, Subitem):
         else:
             product_name = "N/A"
         dictSub['Produit'] = product_name
-        price_span = elem.find('span', class_='actual')
+        price_span = elem.find('span', id=f'{key}-current-price')
         if price_span:
             dictSub['Prix'] = price_span.text.strip()
         else:
@@ -90,9 +90,20 @@ def dict_to_scrap(soup, item, Subitem):
             dictSub['Image'] = elem.find('img', class_='ng-star-inserted')['src']
         except :
             None
+
+        try:
+            bio_image = elem.find('lsp-product-picto')
+            dictSub['BIO'] = 1 if bio_image else 0
+        except:
+            dictSub['BIO'] = 0
+
+
         dictSup[key] = dictSub
 
     return dictSup
+
+
+
 
 
 def dict_links(soup):
@@ -103,3 +114,32 @@ def dict_links(soup):
         value = link.get_text()
         dictLex[key] = value
     return dictLex
+
+def converter_final(temp):
+    converted = []
+    elem = re.findall(r'\d+|\D+',temp)
+    elem = temp.split()
+    elem = [e.strip() for e in elem]
+    try :
+        if elem[1] == 'x' or elem[1] == 'X':
+            temp = float(elem[0]) * float(elem[2])
+            if elem[3] == 'kg' or elem[3] == 'l' or elem[3] == 'pièce' or elem[3] == 'pe':
+                converted.append(temp)
+            elif elem[3] == 'g' or elem[3] == 'ml':
+                converted.append(temp / 1000)
+            elif elem[3] == 'cl':
+                converted.append(temp / 100)
+            else:
+                converted.append(0)
+        elif elem[1] == 'kg' or elem[1] == 'l' or elem[1] == 'pièce' or elem[1] == 'pe':
+            converted.append(float(elem[0]))
+        elif elem[1] == 'cl':
+            converted.append(float(elem[0]) / 100)
+        elif elem[1] == 'g' or elem[1] == 'ml':
+            converted.append(float(elem[0]) / 1000)
+
+        else:
+            converted.append(0)
+    except:
+        converted.append(0)
+    return converted[0]

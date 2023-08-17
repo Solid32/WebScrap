@@ -115,14 +115,16 @@ def dict_links(soup):
         dictLex[key] = value
     return dictLex
 
-def converter_final(temp):
+def converter_final(row):
     converted = []
-    elem = re.findall(r'\d+|\D+',temp)
+    elem = re.findall(r'[\d,.]+|\D+', row)
     elem = [e.strip() for e in elem]
     try :
+        if row.lower().strip() == 'le kg':
+            converted.append(1)
         if elem[1] == 'x' or elem[1] == 'X':
             temp = float(elem[0]) * float(elem[2])
-            if elem[3] == 'kg' or elem[3] == 'l' or elem[3] == 'pièce' or elem[3] == 'pe':
+            if elem[3] == 'kg' or elem[3] == 'l':
                 converted.append(temp)
             elif elem[3] == 'g' or elem[3] == 'ml':
                 converted.append(temp / 1000)
@@ -130,7 +132,7 @@ def converter_final(temp):
                 converted.append(temp / 100)
             else:
                 converted.append(0)
-        elif elem[1] == 'kg' or elem[1] == 'l' or elem[1] == 'pièce' or elem[1] == 'pe':
+        elif elem[1] == 'kg' or elem[1] == 'l' :
             converted.append(float(elem[0]))
         elif elem[1] == 'cl':
             converted.append(float(elem[0]) / 100)
@@ -142,3 +144,15 @@ def converter_final(temp):
     except:
         converted.append(0)
     return converted[0]
+
+def converter_pièce(quantity):
+    matches = re.findall(r'[\d,.]+|\D+', quantity)
+    checker = ['kg', 'l' ,'g', 'ml', 'cl' ,'x' , 'X']
+    try :
+        if matches and matches[0].isdigit()and matches[1].strip() not in checker:
+            numeric_value = float(matches[0].replace(',', ''))
+            return numeric_value
+        else:
+            return 0.0
+    except :
+        return 0.0

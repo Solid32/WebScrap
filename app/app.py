@@ -118,7 +118,6 @@ def dict_links(soup):
 def converter_final(temp):
     converted = []
     elem = re.findall(r'\d+|\D+',temp)
-    elem = temp.split()
     elem = [e.strip() for e in elem]
     try :
         if elem[1] == 'x' or elem[1] == 'X':

@@ -10,15 +10,13 @@ from selenium.webdriver.support import expected_conditions as EC
 def login_to_website(browser, login_url, username, password):
     browser.get(login_url)
 
-    # Assuming there are input fields for username and password
-    username_field = browser.find_element(By.ID, 'username')  # Change to the actual ID
-    password_field = browser.find_element(By.ID, 'password')  # Change to the actual ID
 
-    # Fill in the credentials
+    username_field = browser.find_element(By.ID, 'username')
+    password_field = browser.find_element(By.ID, 'password')
+
     username_field.send_keys(username)
     password_field.send_keys(password)
 
-    # Submit the form
     password_field.submit()
 
 def make_a_dict(browser, url, item):

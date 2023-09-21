@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 produc_list=['fruits-legumes','snacks-confiseries', 'viandes-poissons', 'produits-laitiers-ufs-plats-prep' , 'boulangerie-patisserie-petit-dej', 'pates-condiments-conserves' , 'surgeles' , 'boissons-cafe-the' , 'vins-bieres-spiritueux']
 browser = webdriver.Firefox()
 login_url = 'https://login.migros.ch/login'
-# Replace with the actual login URL
 login_to_website(browser, login_url, MAIL, PWD)
 url = 'https://www.migros.ch/fr/category'
 df = pd.DataFrame()

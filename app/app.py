@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 def login_to_website(browser, login_url, username, password):
+    """Login sur le site : entrée (brower, url, username, password)"""
     browser.get(login_url)
 
 
@@ -20,6 +21,8 @@ def login_to_website(browser, login_url, username, password):
     password_field.submit()
 
 def make_a_dict(browser, url, item):
+    """Fonction parallèle à make_a_soup sans le système de bouton pour la créaion de dictionnaire via dict_links
+    : entrée (browser, url, item) """
     race_day_url = f'{url}/{item}'
     time.sleep(5)
     browser.get(race_day_url)
@@ -30,6 +33,8 @@ def make_a_dict(browser, url, item):
     return answer
 
 def make_a_soup(browser, url, item):
+    """Création de la soupe de données pour dict_to_scrap
+    : entrée (browser, url, item)"""
     race_day_url = f'{url}/{item}'
     browser.get(race_day_url)
     wait = WebDriverWait(browser, 5)
@@ -46,6 +51,8 @@ def make_a_soup(browser, url, item):
     return answer
 
 def dict_to_scrap(soup, item, Subitem):
+    """Création de la database
+    : entrée (soup, item, Subitem)"""
 
     healthsoup = soup.find_all('li', class_='item ng-star-inserted')
     dictSup = {}
@@ -105,15 +112,27 @@ def dict_to_scrap(soup, item, Subitem):
 
 
 def dict_links(soup):
+    """Création du dictionnaire de lien
+    : entrée (soup)"""
     links = soup.find_all('a' , id=lambda value: value and value.startswith('nav-level3-category'))
+    name_titles = soup.find_all('a' , id=lambda value: value and value.startswith('nav-level2-category'))
+    titles = []
+    for elem in name_titles :
+        temp = elem.text.strip()
+        title = re.split(r'[&,]',temp)
+        titles.extend(title)
     dictLex = {}
+    checker = []
     for link in links:
         key = link['href']
         value = link.get_text()
         dictLex[key] = value
-    return dictLex
+        checker.extend(re.split(r'[&,]', value))
+    return dictLex, checker,titles
 
 def converter_final(row):
+    """Convertisseur de str en float pour les prix et quantités
+    : entrée (row) """
     converted = []
     elem = re.findall(r'[\d,.]+|\D+', row)
     elem = [e.strip() for e in elem]
@@ -144,6 +163,8 @@ def converter_final(row):
     return converted[0]
 
 def converter_pièce(quantity):
+    """Fonction parallèle à converter_final pour les prix à la pièce
+    : entrée (quantity)"""
     matches = re.findall(r'[\d,.]+|\D+', quantity)
     checker = ['kg', 'l' ,'g', 'ml', 'cl' ,'x' , 'X']
     try :
@@ -154,3 +175,12 @@ def converter_pièce(quantity):
             return 0.0
     except :
         return 0.0
+
+
+def prix_vrac(row):
+    """Fonction parallèle aux converter pour les produits en vrac
+    : entrée (row)"""
+    if re.search(r'\bvrac\b', row['Produit'].lower()):
+        return row['Prix']
+    else:
+        return row['Prix au kilo']
